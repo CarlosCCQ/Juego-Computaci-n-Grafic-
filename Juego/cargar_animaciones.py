@@ -15,7 +15,7 @@ def cargar_animaciones_personaje(directorio, escala):
 
 def cargar_animaciones_pato(escala, invertir_horizontalmente=False):
     ruta_base = os.path.dirname(__file__)
-    ruta_absoluta = os.path.join(ruta_base + "/scripts/animaciones/pato")
+    ruta_absoluta = os.path.join(ruta_base + "/pato")
     animaciones_pato = []
     for archivo in sorted(os.listdir(ruta_absoluta)):
         if archivo.endswith(".png"):
@@ -32,7 +32,7 @@ def cargar_animaciones_pato(escala, invertir_horizontalmente=False):
 
 def cargar_animaciones_loro( escala):
     ruta_base = os.path.dirname(__file__)
-    ruta_absoluta = os.path.join(ruta_base + "/scripts/animaciones/loro")
+    ruta_absoluta = os.path.join(ruta_base + "/loro")
     animaciones_loro = []
     for archivo in os.listdir(ruta_absoluta):
         if archivo.endswith(".png"):
@@ -47,7 +47,7 @@ def cargar_animaciones_loro( escala):
 
 def cargar_animaciones_fuego(escala, invertir_horizontalmente=False):
     ruta_base = os.path.dirname(__file__)
-    ruta_absoluta = os.path.join(ruta_base +"/scripts/animaciones/fuego" )
+    ruta_absoluta = os.path.join(ruta_base +"/fuego" )
     animaciones_fuego = []
     for archivo in sorted(os.listdir(ruta_absoluta)):
         if archivo.endswith(".png"):
