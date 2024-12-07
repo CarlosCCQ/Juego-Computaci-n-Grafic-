@@ -85,10 +85,11 @@ async def mostrar_instrucciones():
     while mostrando:
         ventana.fill((0, 0, 0))
         mostrar_texto(ventana, "Instrucciones", 50, 100, 50)
-        mostrar_texto(ventana, "Usa las teclas de a y d para moverte", 36, 100, 150)
-        mostrar_texto(ventana, "Presiona 'P' para lanzar agua", 36, 100, 200)
-        mostrar_texto(ventana, "Evita que el bosque se incendie", 36, 100, 250)
-        mostrar_texto(ventana, "Presiona cualquier tecla para volver", 36, 100, 300)
+        mostrar_texto(ventana, "Usa las teclas de 'a' y 'd' para moverte", 36, 100, 150)
+        mostrar_texto(ventana, "Presiona la tecla'ESPACIO' para saltar", 36, 100, 200)
+        mostrar_texto(ventana, "Presiona 'P' para lanzar agua", 36, 100, 250)
+        mostrar_texto(ventana, "Evita que el bosque se incendie", 36, 100, 300)
+        mostrar_texto(ventana, "Presiona cualquier tecla para volver", 36, 100, 350)
         pygame.display.update()
 
         for evento in pygame.event.get():
