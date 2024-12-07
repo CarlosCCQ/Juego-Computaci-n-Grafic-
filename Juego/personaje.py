@@ -2,19 +2,14 @@ from cargar_animaciones import *
 
 class Personaje:
     def __init__(self, x, y, escala):
-        ruta_base = os.path.dirname(__file__)
-        ruta_absoluta_agua = os.path.join(ruta_base + "/personaje_agua")
-        ruta_absoluta_saltando = os.path.join(ruta_base + "/personaje_saltando")
-        ruta_absoluta_caminando = os.path.join(ruta_base + "/personaje_caminando")
-        ruta_absoluta_reposo = os.path.join(ruta_base + "/personaje_reposo")
         self.energia = 100
         self.flip = False
         self.estado = "reposo"
         self.animaciones = {
-            "agua": cargar_animaciones_personaje(ruta_absoluta_agua, escala),
-            "saltando": cargar_animaciones_personaje(ruta_absoluta_saltando, escala),
-            "caminando": cargar_animaciones_personaje(ruta_absoluta_caminando, escala),
-            "reposo": cargar_animaciones_personaje(ruta_absoluta_reposo, escala)
+            "agua": cargar_animaciones_personaje("agua_",4, escala),
+            "saltando": cargar_animaciones_personaje("Guardabosquesaltando",6, escala),
+            "caminando": cargar_animaciones_personaje("Guardabosquecaminando",4, escala),
+            "reposo": cargar_animaciones_personaje("Guardabodqueparado",4, escala)
         }
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()

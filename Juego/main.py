@@ -44,10 +44,10 @@ velocidad_salto = -7
 gravedad = 0.5
 reloj = pygame.time.Clock()
 
-pygame.mixer.music.load(os.path.join(ruta_base + "/sonidos/sonido_bosque.ogg"))
+pygame.mixer.music.load(os.path.join(ruta_base + "/sonido_bosque.ogg"))
 pygame.mixer.music.play(-1)
-sonido_agua = pygame.mixer.Sound(os.path.join(ruta_base + "/sonidos/sonido_agua.ogg"))
-sonido_loro = pygame.mixer.Sound(os.path.join(ruta_base + "/sonidos/sonido_loro.ogg"))
+sonido_agua = pygame.mixer.Sound(os.path.join(ruta_base + "/sonido_agua.ogg"))
+sonido_loro = pygame.mixer.Sound(os.path.join(ruta_base + "/sonido_loro.ogg"))
 
 def mostrar_texto(ventana, texto, tamano, x, y, color=(255, 255, 255)):
     fuente = pygame.font.Font(None, tamano)

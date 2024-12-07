@@ -7,11 +7,11 @@ import constantes
 def decoraciones_planta():
     ruta_base = os.path.dirname(__file__)
     decoraciones_sprites = {
-        0: pygame.image.load(ruta_base +"/plantas/arbol (0).png"),
-        1: pygame.image.load(ruta_base +"/plantas/arbol (1).png"),
-        2: pygame.image.load(ruta_base +"/plantas/arbol (2).png"),
-        3: pygame.image.load(ruta_base +"/plantas/arbol (3).png"),
-        6: pygame.image.load(ruta_base +"/plantas/arbol (6).png"),
+        0: pygame.image.load(ruta_base +"/arbol (0).png"),
+        1: pygame.image.load(ruta_base +"/arbol (1).png"),
+        2: pygame.image.load(ruta_base +"/arbol (2).png"),
+        3: pygame.image.load(ruta_base +"/arbol (3).png"),
+        6: pygame.image.load(ruta_base +"/arbol (6).png"),
     }
 
     for key in decoraciones_sprites:
@@ -22,7 +22,7 @@ def decoraciones_planta():
 
 def cargar_decoraciones_planta():
     ruta_base = os.path.dirname(__file__)
-    ruta_csv = os.path.join(ruta_base + "/juego_csv/plantas.csv")
+    ruta_csv = os.path.join(ruta_base + "/plantas.csv")
     decoraciones = []
     with open(ruta_csv) as archivo_csv:
         lector = csv.reader(archivo_csv, delimiter=',')
