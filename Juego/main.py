@@ -8,13 +8,13 @@
 import asyncio
 #import pygbag.aio as asyncio
 import sys
-from scripts.fondo import *
-from scripts.suelo import *
-from scripts.plantas import *
-from scripts.pato import *
-from scripts.personaje import *
-from scripts.fuego import *
-from scripts.loro import *
+from fondo import *
+from suelo import *
+from plantas import *
+from pato import *
+from personaje import *
+from fuego import *
+from loro import *
 import os
 
 pygame.init()
@@ -117,7 +117,7 @@ async def bucle_juego():
 
     while corriendo:
         reloj.tick(constantes.FPS)
-        tiempo_transcurrido += 1/constantes.FPS
+        tiempo_transcurrido += 1 / constantes.FPS
         dibujar_fondo(fondo, ventana)
         dibujar_nivel(suelo, tile_sprites_nivel, ventana)
         dibujar_decoraciones_planta(decoraciones_mapa, decoraciones_sprites, ventana)

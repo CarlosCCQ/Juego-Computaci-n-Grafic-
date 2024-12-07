@@ -1,11 +1,12 @@
 import csv
 import os
 import pygame
-from scripts import constantes
+import constantes
+
 
 def cargar_fondo():
     ruta_base = os.path.dirname(__file__)
-    ruta_csv_fondo = os.path.abspath(os.path.join(ruta_base + "/juego_csv/fondo.csv"))
+    ruta_csv_fondo = os.path.abspath(os.path.join(ruta_base + "/scripts/juego_csv/fondo.csv"))
     fondo = []
     with open(ruta_csv_fondo) as archivo_csv_fondo:
         lector = csv.reader(archivo_csv_fondo, delimiter=',')
@@ -16,7 +17,7 @@ def cargar_fondo():
 
 def dibujar_fondo(fondo, ventana):
     ruta_base = os.path.dirname(__file__)
-    sprite_fondo = pygame.image.load(os.path.join(ruta_base + "/nivel/fondo/fondo.png"))
+    sprite_fondo = pygame.image.load(os.path.join(ruta_base + "/scripts/nivel/fondo/fondo.png"))
     for fila_idx, fila in enumerate(fondo):
         for col_idx, celda in enumerate(fila):
             if celda == 0:

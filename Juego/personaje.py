@@ -1,12 +1,12 @@
-from scripts.cargar_animaciones import *
+from cargar_animaciones import *
 
 class Personaje:
     def __init__(self, x, y, escala):
         ruta_base = os.path.dirname(__file__)
-        ruta_absoluta_agua = os.path.join(ruta_base + "/animaciones/personaje_agua")
-        ruta_absoluta_saltando = os.path.join(ruta_base + "/animaciones/personaje_saltando")
-        ruta_absoluta_caminando = os.path.join(ruta_base + "/animaciones/personaje_caminando")
-        ruta_absoluta_reposo = os.path.join(ruta_base + "/animaciones/personaje_reposo")
+        ruta_absoluta_agua = os.path.join(ruta_base + "/scripts/animaciones/personaje_agua")
+        ruta_absoluta_saltando = os.path.join(ruta_base + "/scripts/animaciones/personaje_saltando")
+        ruta_absoluta_caminando = os.path.join(ruta_base + "/scripts/animaciones/personaje_caminando")
+        ruta_absoluta_reposo = os.path.join(ruta_base + "/scripts/animaciones/personaje_reposo")
         self.energia = 100
         self.flip = False
         self.estado = "reposo"

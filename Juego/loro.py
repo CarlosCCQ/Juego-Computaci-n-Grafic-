@@ -1,5 +1,5 @@
 import random
-from scripts.cargar_animaciones import *
+from cargar_animaciones import *
 
 class Loro:
     def __init__(self, x, y, escala):

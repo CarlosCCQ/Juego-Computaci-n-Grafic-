@@ -1,6 +1,7 @@
-from scripts.cargar_animaciones import *
+from cargar_animaciones import *
 import random
-from scripts import constantes
+import constantes
+
 
 class Enemigo:
     def __init__(self, x, y,animaciones, escala, velocidad_x, plataforma=None):

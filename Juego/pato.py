@@ -1,6 +1,6 @@
 import random
-from scripts import constantes
-from scripts.cargar_animaciones import *
+import constantes
+from cargar_animaciones import *
 
 class Pato:
     def __init__(self, x, y, animaciones):
