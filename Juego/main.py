@@ -1,22 +1,14 @@
 # /// script
 # requires-python = ">=3.11"
 # dependencies = [
-#  "pygame"
+#  "pygame-ce",
+# "cffi"
 # ]
 # ///
 
 import asyncio
-#import pygbag.aio as asyncio
-#from cargar_animaciones import *
 import sys
 import pygame
-# from fondo import *
-# from suelo import *
-# from plantas import *
-# from pato import *
-# from personaje import *
-# from fuego import *
-# from loro import *
 import random
 import os
 import csv
@@ -101,13 +93,14 @@ class Personaje:
         self.forma.x += delta_x
         self.forma.y += delta_y
 
-        if delta_x != 0 or delta_y != 0:
-            self.cambiar_estado("caminando")
-        else:
+        if delta_x == 0 and delta_y == 0 and self.estado != "agua":
             self.cambiar_estado("reposo")
+        else:
+            if delta_x != 0 or delta_y != 0:
+                self.cambiar_estado("caminando")
 
     def update(self):
-        cooldown_animaciones = 200
+        cooldown_animaciones = 20 if self.estado != "reposo" else 200
 
         if pygame.time.get_ticks() - self.update_time >= cooldown_animaciones:
             self.frame_index += 1
@@ -115,7 +108,7 @@ class Personaje:
 
             if self.frame_index >= len(self.animaciones[self.estado]):
                 if self.estado == "agua":
-                    self.frame_index = len(self.animaciones[self.estado]) - 1
+                    self.cambiar_estado("reposo")
                 else:
                     self.frame_index = 0
 
@@ -457,32 +450,6 @@ def mostrar_texto(ventana, texto, tamano, x, y, color=(255, 255, 255)):
     superficie = fuente.render(texto, True, color)
     ventana.blit(superficie, (x, y))
 
-async def menu_principal():
-    pygame.event.clear()
-    pygame.time.delay(200)
-
-    menu = True
-    while menu:
-        ventana.fill((0, 0, 0))
-        mostrar_texto(ventana, "Guardabosques vs fuego", 50, 100, 50)
-        mostrar_texto(ventana, "1. Iniciar Juego", 36, 100, 150)
-        mostrar_texto(ventana, "2. Instrucciones", 36, 100, 200)
-        mostrar_texto(ventana, "3. Salir", 36, 100, 250)
-        pygame.display.update()
-
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            elif evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_1:
-                    menu = False
-                elif evento.key == pygame.K_2:
-                    await mostrar_instrucciones()
-                elif evento.key == pygame.K_3:
-                    pygame.quit()
-                    exit()
-
 async def mostrar_instrucciones():
     mostrando = True
     while mostrando:
@@ -502,12 +469,16 @@ async def mostrar_instrucciones():
             if evento.type == pygame.KEYDOWN:
                 mostrando = False
 
-#menu_principal()
+async def main():
+    pygame.event.clear()
+    pygame.time.delay(200)
 
-async def bucle_juego():
+    menu = True
+    corriendo = True
+
     tiempo_transcurrido = 0
     puntaje = 0
-    jugador = Personaje(40, 40, SCALA_PERSONAJE)  # Reiniciar el personaje
+    jugador = Personaje(40, 40, SCALA_PERSONAJE)
     enemigos = inicializar_enemigo(suelo, num_max_enemigos, escala_enemigo, sprite_altura_enemigo)
     loros = []
     mover_derecha = False
@@ -516,201 +487,224 @@ async def bucle_juego():
     esta_en_suelo = True
     velocidad_y = 0
     echando_agua = False
-    corriendo = True
 
     while corriendo:
-        reloj.tick(FPS)
-        tiempo_transcurrido += 1 / FPS
-        dibujar_fondo(fondo, ventana)
-        dibujar_nivel(suelo, tile_sprites_nivel, ventana)
-        dibujar_decoraciones_planta(decoraciones_mapa, decoraciones_sprites, ventana)
-
-        if tiempo_transcurrido >= TIEMPO_TOTAL:
-            corriendo = False
-
-        tiempo_restante = TIEMPO_TOTAL - int(tiempo_transcurrido)
-        fuente_tiempo = pygame.font.Font(None, 24)
-        texto_tiempo = fuente_tiempo.render(f"Tiempo: {tiempo_restante}s", True, (255, 255, 255))
-        ventana.blit(texto_tiempo, (ANCHO_VENTANA - 150, 10))
-
-        if tiempo_transcurrido >= TIEMPO_TOTAL:
+        if menu:
             ventana.fill((0, 0, 0))
-            mostrar_texto(ventana, "¡Game Over!", 36, 100, 200, (255, 0, 0))
-            mostrar_texto(ventana, "Presiona cualquier tecla para volver al menú.", 20, 100, 250, (255, 255, 255))
+            mostrar_texto(ventana, "Guardabosques vs fuego", 50, 100, 50)
+            mostrar_texto(ventana, "1. Iniciar Juego", 36, 100, 150)
+            mostrar_texto(ventana, "2. Instrucciones", 36, 100, 200)
+            mostrar_texto(ventana, "3. Salir", 36, 100, 250)
             pygame.display.update()
 
-            esperando = True
-            while esperando:
-                for evento in pygame.event.get():
-                    if evento.type == pygame.QUIT:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_1:
+                        tiempo_transcurrido = 0
+                        puntaje = 0
+                        enemigos = inicializar_enemigo(suelo, num_max_enemigos, escala_enemigo, sprite_altura_enemigo)
+                        loros = []
+                        mover_derecha = False
+                        mover_izquierda = False
+                        salto = False
+                        esta_en_suelo = True
+                        velocidad_y = 0
+                        echando_agua = False
+                        menu = False
+                    elif evento.key == pygame.K_2:
+                        await mostrar_instrucciones()
+                    elif evento.key == pygame.K_3:
                         pygame.quit()
                         exit()
-                    if evento.type == pygame.KEYDOWN:
-                        esperando = False
-
-            pygame.time.delay(200)
-            pygame.event.clear()
-            await menu_principal()
-            break
-
-        if len(enemigos) == 0 or jugador.forma.top > ALTO_VENTANA:
-            ventana.fill((0, 0, 0))
-
-            jugador_gano = len(enemigos) == 0
-            mensaje = "¡Felicidades! Bosque salvado." if jugador_gano else "¡Game Over!"
-            color = (0, 255, 0) if jugador_gano else (255, 0, 0)
-
-            mostrar_texto(ventana, mensaje, 36, 100, 200, color)
-            mostrar_texto(ventana, "Presiona cualquier tecla para volver al menú.", 20, 100, 250, (255, 255, 255))
-            pygame.display.update()
-
-            esperando = True
-            while esperando:
-                for evento in pygame.event.get():
-                    if evento.type == pygame.QUIT:
-                        pygame.quit()
-                        exit()
-                    if evento.type == pygame.KEYDOWN:
-                        esperando = False
-
-            pygame.time.delay(200)
-            pygame.event.clear()
-            await menu_principal()
-            break
-
-        if random.randint(1, 300) == 1:
-            x_inicial = -TILE_SIZE if random.choice([True, False]) else ANCHO_VENTANA
-            y_inicial = random.randint(50, ALTO_VENTANA - 100)
-            nuevo_loro = Loro(x_inicial, y_inicial, SCALA_ENEMIGOS)
-            loros.append(nuevo_loro)
-
-        delta_x = 0
-        if mover_derecha:
-            delta_x += VELOCIDAD_PERSONAJE
-        if mover_izquierda:
-            delta_x -= VELOCIDAD_PERSONAJE
-
-        if salto and esta_en_suelo:
-            velocidad_y = velocidad_salto
-            esta_en_suelo = False
-
-        jugador.forma.x += delta_x
-        jugador.forma.y += velocidad_y
-
-        jugador.limitar_dentro_de_nivel(ANCHO_VENTANA)
-
-        velocidad_y += gravedad
-        jugador.forma.y += velocidad_y
-
-        jugador_colisionado = False
-        for fila_idx, fila in enumerate(suelo):
-            for col_idx, celda in enumerate(fila):
-                if celda in [0, 1, 2, 3, 18, 19, 20, 21]:
-                    tile_rect = pygame.Rect(
-                        col_idx * TILE_SIZE,
-                        fila_idx * TILE_SIZE,
-                        TILE_SIZE,
-                        TILE_SIZE
-                    )
-                    if jugador.forma.colliderect(tile_rect):
-                        jugador_colisionado = True
-                        if jugador.forma.bottom > tile_rect.top and jugador.forma.top < tile_rect.top and velocidad_y > 0:
-                            jugador.forma.bottom = tile_rect.top
-                            esta_en_suelo = True
-                            velocidad_y = 0
-                        elif jugador.forma.right > tile_rect.left and jugador.forma.left < tile_rect.left and delta_x > 0:
-                            jugador.forma.right = tile_rect.left
-                            delta_x = 0
-                        elif jugador.forma.left < tile_rect.right and jugador.forma.right > tile_rect.right and delta_x < 0:
-                            jugador.forma.left = tile_rect.right
-                            delta_x = 0
-
-        if not jugador_colisionado:
-            esta_en_suelo = False
-
-        if echando_agua:
-            jugador.cambiar_estado("agua")
         else:
-            if not esta_en_suelo:
-                jugador.cambiar_estado("saltando")
-            elif delta_x != 0:
-                jugador.cambiar_estado("caminando")
+            
+            reloj.tick(FPS)
+            tiempo_transcurrido += 1 / FPS
+            dibujar_fondo(fondo, ventana)
+            dibujar_nivel(suelo, tile_sprites_nivel, ventana)
+            dibujar_decoraciones_planta(decoraciones_mapa, decoraciones_sprites, ventana)
+
+            tiempo_restante = TIEMPO_TOTAL - int(tiempo_transcurrido)
+            fuente_tiempo = pygame.font.Font(None, 24)
+            texto_tiempo = fuente_tiempo.render(f"Tiempo: {tiempo_restante}s", True, (255, 255, 255))
+            ventana.blit(texto_tiempo, (ANCHO_VENTANA - 150, 10))
+
+            if tiempo_transcurrido >= TIEMPO_TOTAL:
+                ventana.fill((0, 0, 0))
+                mostrar_texto(ventana, "¡Game Over!", 36, 100, 200, (255, 0, 0))
+                mostrar_texto(ventana, "Presiona cualquier tecla para volver al menú.", 20, 100, 250, (255, 255, 255))
+                pygame.display.update()
+
+                esperando = True
+                while esperando:
+                    for evento in pygame.event.get():
+                        if evento.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+                        if evento.type == pygame.KEYDOWN:
+                            esperando = False
+
+                pygame.event.clear()
+                pygame.time.delay(300)
+                continue
+
+            if len(enemigos) == 0 or jugador.forma.top > ALTO_VENTANA:
+                ventana.fill((0, 0, 0))
+
+                jugador_gano = len(enemigos) == 0
+                mensaje = "¡Felicidades! Bosque salvado." if jugador_gano else "¡Game Over!"
+                color = (0, 255, 0) if jugador_gano else (255, 0, 0)
+
+                mostrar_texto(ventana, mensaje, 36, 100, 200, color)
+                mostrar_texto(ventana, "Presiona cualquier tecla para volver al menú.", 20, 100, 250, (255, 255, 255))
+                pygame.display.update()
+
+                esperando = True
+                while esperando:
+                    for evento in pygame.event.get():
+                        if evento.type == pygame.QUIT:
+                            pygame.quit()
+                            exit()
+                        if evento.type == pygame.KEYDOWN:
+                            esperando = False
+
+                pygame.time.delay(200)
+                pygame.event.clear()
+                menu = True
+                continue
+
+            if random.randint(1, 300) == 1 and len(loros) < 3:
+                x_inicial = -TILE_SIZE if random.choice([True, False]) else ANCHO_VENTANA
+                y_inicial = random.randint(50, ALTO_VENTANA - 100)
+                nuevo_loro = Loro(x_inicial, y_inicial, SCALA_ENEMIGOS)
+                loros.append(nuevo_loro)
+
+            delta_x = 0
+            if mover_derecha:
+                delta_x += VELOCIDAD_PERSONAJE
+            if mover_izquierda:
+                delta_x -= VELOCIDAD_PERSONAJE
+
+            if salto and esta_en_suelo:
+                velocidad_y = velocidad_salto
+                esta_en_suelo = False
+
+            jugador.forma.x += delta_x
+            jugador.forma.y += velocidad_y
+
+            jugador.limitar_dentro_de_nivel(ANCHO_VENTANA)
+
+            velocidad_y += gravedad
+            jugador.forma.y += velocidad_y
+
+            jugador_colisionado = False
+            for fila_idx, fila in enumerate(suelo):
+                for col_idx, celda in enumerate(fila):
+                    if celda in [0, 1, 2, 3, 18, 19, 20, 21]:
+                        tile_rect = pygame.Rect(
+                            col_idx * TILE_SIZE,
+                            fila_idx * TILE_SIZE,
+                            TILE_SIZE,
+                            TILE_SIZE
+                        )
+                        if jugador.forma.colliderect(tile_rect):
+                            jugador_colisionado = True
+                            if jugador.forma.bottom > tile_rect.top and jugador.forma.top < tile_rect.top and velocidad_y > 0:
+                                jugador.forma.bottom = tile_rect.top
+                                esta_en_suelo = True
+                                velocidad_y = 0
+                            elif jugador.forma.right > tile_rect.left and jugador.forma.left < tile_rect.left and delta_x > 0:
+                                jugador.forma.right = tile_rect.left
+                                delta_x = 0
+                            elif jugador.forma.left < tile_rect.right and jugador.forma.right > tile_rect.right and delta_x < 0:
+                                jugador.forma.left = tile_rect.right
+                                delta_x = 0
+
+            if not jugador_colisionado:
+                esta_en_suelo = False
+
+            if echando_agua:
+                if jugador.estado != "agua":
+                    jugador.cambiar_estado("agua")
             else:
-                jugador.cambiar_estado("reposo")
-
-
-        for pato in patos:
-            pato.update()
-            pato.dibujar(ventana)
-
-        for enemigo in enemigos[:]:
-            enemigo.update()
-            enemigo.dibujar(ventana)
-
-            enemigo_rect = pygame.Rect(enemigo.x, enemigo.y, enemigo.animaciones[0].get_width(),
-                                       enemigo.animaciones[0].get_height())
-            if jugador.forma.colliderect(enemigo_rect):
-                if jugador.estado == "agua":
-                    enemigos.remove(enemigo)
-                    puntaje += 10
-                    nuevos_enemigos = inicializar_enemigo(
-                        suelo,
-                        random.randint(0, 1),
-                        escala_enemigo,
-                        sprite_altura_enemigo
-                    )
-                    enemigos.extend(nuevos_enemigos)
+                if not esta_en_suelo:
+                    jugador.cambiar_estado("saltando")
+                elif delta_x != 0:
+                    jugador.cambiar_estado("caminando")
                 else:
-                    enemigo.detener()
-            else:
-                enemigo.reanudar()
+                    jugador.cambiar_estado("reposo")
 
-        for loro in loros[:]:
-            loro.update()
-            loro.dibujar(ventana)
-            sonido_loro.set_volume(0.2)
-            sonido_loro.play()
-            if loro.fuera_de_pantalla(ANCHO_VENTANA, ALTO_VENTANA):
-                loros.remove(loro)
-                sonido_loro.stop()
 
-        jugador.movimiento(delta_x, 0)
-        jugador.update()
-        jugador.dibujar(ventana)
+            for pato in patos:
+                pato.update()
+                pato.dibujar(ventana)
 
-        mostrar_texto(ventana, f"Puntaje: {puntaje}", 36, 10, 10)
+            for enemigo in enemigos[:]:
+                enemigo.update()
+                enemigo.dibujar(ventana)
 
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_d:
-                    mover_derecha = True
-                elif evento.key == pygame.K_a:
-                    mover_izquierda = True
-                elif evento.key == pygame.K_SPACE:
-                    salto = True
-                elif evento.key == pygame.K_p:
-                    echando_agua = True
-                    sonido_agua.play()
-            elif evento.type == pygame.KEYUP:
-                if evento.key == pygame.K_d:
-                    mover_derecha = False
-                elif evento.key == pygame.K_a:
-                    mover_izquierda = False
-                elif evento.key == pygame.K_SPACE:
-                    salto = False
-                elif evento.key == pygame.K_p:
-                    echando_agua = False
+                enemigo_rect = pygame.Rect(enemigo.x, enemigo.y, enemigo.animaciones[0].get_width(),
+                                       enemigo.animaciones[0].get_height())
+                if jugador.forma.colliderect(enemigo_rect):
+                    if jugador.estado == "agua":
+                        enemigos.remove(enemigo)
+                        puntaje += 10
+                        nuevos_enemigos = inicializar_enemigo(
+                            suelo,
+                            random.randint(0, 1),
+                            escala_enemigo,
+                            sprite_altura_enemigo
+                        )
+                        enemigos.extend(nuevos_enemigos)
+                    else:
+                        enemigo.detener()
+                else:
+                    enemigo.reanudar()
 
-        pygame.display.update()
+            for loro in loros[:]:
+                loro.update()
+                loro.dibujar(ventana)
+                sonido_loro.set_volume(0.2)
+                sonido_loro.play()
+                if loro.fuera_de_pantalla(ANCHO_VENTANA, ALTO_VENTANA):
+                    loros.remove(loro)
+                    sonido_loro.stop()
+
+            jugador.movimiento(delta_x, 0)
+            jugador.update()
+            jugador.dibujar(ventana)
+
+            mostrar_texto(ventana, f"Puntaje: {puntaje}", 36, 10, 10)
+
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_d:
+                        mover_derecha = True
+                    elif evento.key == pygame.K_a:
+                        mover_izquierda = True
+                    elif evento.key == pygame.K_SPACE:
+                        salto = True
+                    elif evento.key == pygame.K_p:
+                        echando_agua = True
+                        sonido_agua.play()
+                elif evento.type == pygame.KEYUP:
+                    if evento.key == pygame.K_d:
+                        mover_derecha = False
+                    elif evento.key == pygame.K_a:
+                        mover_izquierda = False
+                    elif evento.key == pygame.K_SPACE:
+                        salto = False
+                    elif evento.key == pygame.K_p:
+                        echando_agua = False
+
+            pygame.display.update()
         await asyncio.sleep(0)
-
-async def main():
-    await menu_principal()
-    while True:
-        await bucle_juego()
 
 if __name__ == '__main__':
     asyncio.run(main())
