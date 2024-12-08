@@ -408,7 +408,7 @@ class Loro:
         self.flip = self.direccion == -1
 
     def update(self):
-        cooldown_animaciones = 200
+        cooldown_animaciones = 100
         if pygame.time.get_ticks() - self.update_time >= cooldown_animaciones:
             self.frame_index += 1
             self.update_time = pygame.time.get_ticks()
@@ -468,8 +468,8 @@ async def main():
     escala_enemigo = SCALA_ENEMIGOS * 0.8
     animaciones_enemigo_temp = cargar_animaciones_fuego(escala_enemigo)
     sprite_altura_enemigo = animaciones_enemigo_temp[0].get_height()
-    num_max_enemigos = 5
-    TIEMPO_TOTAL = 180
+    num_max_enemigos = 7
+    TIEMPO_TOTAL = 120
     velocidad_salto = -7
     gravedad = 0.5
     reloj = pygame.time.Clock()
