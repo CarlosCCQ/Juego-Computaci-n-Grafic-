@@ -17,19 +17,16 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-# Dimensiones
 ANCHO_VENTANA = 620
 ALTO_VENTANA = 434
 TILE_SIZE = 31
 FILAS = 14
 COLUMNAS = 20
 
-# Colores
 COLOR_PERSONAJE = (255, 255, 0)
 COLOR_BG = (135, 206, 235)
 COLOR_BLANCO = (255, 255, 255)
 
-# Configuración de animaciones y enemigos
 FPS = 30
 VELOCIDAD_PERSONAJE = 2
 VELOCIDAD_ENEMIGO = 2
@@ -43,6 +40,7 @@ ventana = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
 pygame.display.set_caption("Guardabosques")
 
 ruta_base = os.path.dirname(__file__)
+
 
 def cargar_animaciones_personaje(prefijo, cantidad, escala):
     animaciones_personaje = []
@@ -58,16 +56,17 @@ def cargar_animaciones_personaje(prefijo, cantidad, escala):
             animaciones_personaje.append(img)
     return animaciones_personaje
 
+
 class Personaje:
     def __init__(self, x, y, escala):
         self.energia = 100
         self.flip = False
         self.estado = "reposo"
         self.animaciones = {
-            "agua": cargar_animaciones_personaje("agua_",4, escala),
-            "saltando": cargar_animaciones_personaje("Guardabosquesaltando",6, escala),
-            "caminando": cargar_animaciones_personaje("Guardabosquecaminando",4, escala),
-            "reposo": cargar_animaciones_personaje("Guardabodqueparado",4, escala)
+            "agua": cargar_animaciones_personaje("agua_", 4, escala),
+            "saltando": cargar_animaciones_personaje("Guardabosquesaltando", 6, escala),
+            "caminando": cargar_animaciones_personaje("Guardabosquecaminando", 4, escala),
+            "reposo": cargar_animaciones_personaje("Guardabodqueparado", 4, escala)
         }
         self.frame_index = 0
         self.update_time = pygame.time.get_ticks()
@@ -100,7 +99,7 @@ class Personaje:
                 self.cambiar_estado("caminando")
 
     def update(self):
-        cooldown_animaciones = 20 if self.estado != "reposo" else 200
+        cooldown_animaciones = 20 if self.estado != "reposo" else 30
 
         if pygame.time.get_ticks() - self.update_time >= cooldown_animaciones:
             self.frame_index += 1
@@ -127,22 +126,21 @@ class Personaje:
         if self.forma.top < 0:
             self.forma.top = 0
 
-jugador = Personaje(40, 40,SCALA_PERSONAJE)
-
 def decoraciones_planta():
     decoraciones_sprites = {
-        0: pygame.image.load(ruta_base +"/arbol (0).png"),
-        1: pygame.image.load(ruta_base +"/arbol (1).png"),
-        2: pygame.image.load(ruta_base +"/arbol (2).png"),
-        3: pygame.image.load(ruta_base +"/arbol (3).png"),
-        6: pygame.image.load(ruta_base +"/arbol (6).png"),
+        0: pygame.image.load(ruta_base + "/arbol (0).png"),
+        1: pygame.image.load(ruta_base + "/arbol (1).png"),
+        2: pygame.image.load(ruta_base + "/arbol (2).png"),
+        3: pygame.image.load(ruta_base + "/arbol (3).png"),
+        6: pygame.image.load(ruta_base + "/arbol (6).png"),
     }
 
     for key in decoraciones_sprites:
         decoraciones_sprites[key] = pygame.transform.scale(decoraciones_sprites[key], (
-        TILE_SIZE, TILE_SIZE))
+            TILE_SIZE, TILE_SIZE))
 
     return decoraciones_sprites
+
 
 def cargar_decoraciones_planta():
     ruta_csv = os.path.join(ruta_base + "/plantas.csv")
@@ -152,6 +150,7 @@ def cargar_decoraciones_planta():
         for fila in lector:
             decoraciones.append([int(celda) for celda in fila])
     return decoraciones
+
 
 def dibujar_decoraciones_planta(decoraciones, decoraciones_sprites, ventana):
     for fila_idx, fila in enumerate(decoraciones):
@@ -163,16 +162,18 @@ def dibujar_decoraciones_planta(decoraciones, decoraciones_sprites, ventana):
                     y = fila_idx * TILE_SIZE
                     ventana.blit(sprite, (x, y))
 
+
 def cargar_sprites_nivel():
     tile_sprites_nivel = {}
     for tile_id in [0, 1, 2, 3, 18, 19, 20, 21]:
         ruta = ruta_base + f"/tiled ({tile_id}).png"
         tile_sprites_nivel[tile_id] = pygame.image.load(ruta)
         tile_sprites_nivel[tile_id] = pygame.transform.scale(tile_sprites_nivel[tile_id], (
-        TILE_SIZE, TILE_SIZE))
+            TILE_SIZE, TILE_SIZE))
 
     tile_sprites_nivel[-1] = None
     return tile_sprites_nivel
+
 
 def cargar_nivel():
     ruta_csv = os.path.join(ruta_base + "/suelo.csv")
@@ -183,6 +184,7 @@ def cargar_nivel():
             nivel.append([int(celda) for celda in fila])
     return nivel
 
+
 def dibujar_nivel(nivel, tile_sprites_nivel, ventana):
     for fila_idx, fila in enumerate(nivel):
         for col_idx, celda in enumerate(fila):
@@ -190,6 +192,7 @@ def dibujar_nivel(nivel, tile_sprites_nivel, ventana):
                 sprite = tile_sprites_nivel.get(celda)
                 if sprite:
                     ventana.blit(sprite, (col_idx * TILE_SIZE, fila_idx * TILE_SIZE))
+
 
 class Pato:
     def __init__(self, x, y, animaciones):
@@ -237,6 +240,7 @@ def inicializar_patos(nivel_suelo):
 
     return patos
 
+
 def cargar_fondo():
     ruta_csv_fondo = os.path.abspath(os.path.join(ruta_base + "/fondo.csv"))
     fondo = []
@@ -255,6 +259,7 @@ def dibujar_fondo(fondo, ventana):
                 x = col_idx * TILE_SIZE
                 y = fila_idx * TILE_SIZE
                 ventana.blit(sprite_fondo, (x, y))
+
 
 def cargar_animaciones_pato(escala, invertir_horizontalmente=False):
     animaciones_pato = []
@@ -275,7 +280,7 @@ def cargar_animaciones_pato(escala, invertir_horizontalmente=False):
     return animaciones_pato
 
 
-def cargar_animaciones_loro( escala):
+def cargar_animaciones_loro(escala):
     animaciones_loro = []
     for i in range(1, 8):
         nombre_archivo = f"/LoroVolador{i}.png"
@@ -311,8 +316,9 @@ def cargar_animaciones_fuego(escala, invertir_horizontalmente=False):
 
     return animaciones_fuego
 
+
 class Enemigo:
-    def __init__(self, x, y,animaciones, escala, velocidad_x, plataforma=None):
+    def __init__(self, x, y, animaciones, escala, velocidad_x, plataforma=None):
         self.animaciones = animaciones
         self.x = x
         self.y = y
@@ -388,27 +394,6 @@ def inicializar_enemigo(nivel_suelo, num_enemigos, escala_enemigo, altura_sprite
 
     return enemigos
 
-decoraciones_sprites = decoraciones_planta()
-decoraciones_mapa = cargar_decoraciones_planta()
-tile_sprites_nivel = cargar_sprites_nivel()
-suelo = cargar_nivel()
-patos = inicializar_patos(suelo)
-fondo = cargar_fondo()
-
-escala_enemigo = SCALA_ENEMIGOS * 0.8
-animaciones_enemigo_temp = cargar_animaciones_fuego(escala_enemigo)
-sprite_altura_enemigo = animaciones_enemigo_temp[0].get_height()
-num_max_enemigos = 5
-TIEMPO_TOTAL = 180
-limite_enemigos = 0
-velocidad_salto = -7
-gravedad = 0.5
-reloj = pygame.time.Clock()
-
-pygame.mixer.music.load(os.path.join(ruta_base + "/sonido_bosque.ogg"))
-pygame.mixer.music.play(-1)
-sonido_agua = pygame.mixer.Sound(os.path.join(ruta_base + "/sonido_agua.ogg"))
-sonido_loro = pygame.mixer.Sound(os.path.join(ruta_base + "/sonido_loro.ogg"))
 
 class Loro:
     def __init__(self, x, y, escala):
@@ -441,16 +426,18 @@ class Loro:
 
     def fuera_de_pantalla(self, ancho_ventana, alto_ventana):
         return (
-            self.forma.right < 0 or self.forma.left > ancho_ventana or
-            self.forma.bottom < 0 or self.forma.top > alto_ventana
+                self.forma.right < 0 or self.forma.left > ancho_ventana or
+                self.forma.bottom < 0 or self.forma.top > alto_ventana
         )
+
 
 def mostrar_texto(ventana, texto, tamano, x, y, color=(255, 255, 255)):
     fuente = pygame.font.Font(None, tamano)
     superficie = fuente.render(texto, True, color)
     ventana.blit(superficie, (x, y))
 
-async def mostrar_instrucciones():
+
+def mostrar_instrucciones():
     mostrando = True
     while mostrando:
         ventana.fill((0, 0, 0))
@@ -469,7 +456,25 @@ async def mostrar_instrucciones():
             if evento.type == pygame.KEYDOWN:
                 mostrando = False
 
+
 async def main():
+    decoraciones_sprites = decoraciones_planta()
+    decoraciones_mapa = cargar_decoraciones_planta()
+    tile_sprites_nivel = cargar_sprites_nivel()
+    suelo = cargar_nivel()
+    patos = inicializar_patos(suelo)
+    fondo = cargar_fondo()
+    jugador = Personaje(40, 40, SCALA_PERSONAJE)
+    escala_enemigo = SCALA_ENEMIGOS * 0.8
+    animaciones_enemigo_temp = cargar_animaciones_fuego(escala_enemigo)
+    sprite_altura_enemigo = animaciones_enemigo_temp[0].get_height()
+    num_max_enemigos = 5
+    TIEMPO_TOTAL = 180
+    velocidad_salto = -7
+    gravedad = 0.5
+    reloj = pygame.time.Clock()
+    sonido_agua = pygame.mixer.Sound(os.path.join(ruta_base + "/sonido_agua.ogg"))
+    sonido_loro = pygame.mixer.Sound(os.path.join(ruta_base + "/sonido_loro.ogg"))
     pygame.event.clear()
     pygame.time.delay(200)
 
@@ -478,7 +483,6 @@ async def main():
 
     tiempo_transcurrido = 0
     puntaje = 0
-    jugador = Personaje(40, 40, SCALA_PERSONAJE)
     enemigos = inicializar_enemigo(suelo, num_max_enemigos, escala_enemigo, sprite_altura_enemigo)
     loros = []
     mover_derecha = False
@@ -490,6 +494,9 @@ async def main():
 
     while corriendo:
         if menu:
+            sonido_agua.stop()
+            sonido_loro.stop()
+            pygame.mixer.music.stop()
             ventana.fill((0, 0, 0))
             mostrar_texto(ventana, "Guardabosques vs fuego", 50, 100, 50)
             mostrar_texto(ventana, "1. Iniciar Juego", 36, 100, 150)
@@ -503,8 +510,14 @@ async def main():
                     exit()
                 elif evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_1:
+                        sonido_agua.stop()
+                        sonido_loro.stop()
+                        pygame.mixer.music.stop()
+                        pygame.mixer.music.load(os.path.join(ruta_base + "/sonido_bosque.ogg"))
+                        pygame.mixer.music.play(-1)
                         tiempo_transcurrido = 0
                         puntaje = 0
+                        jugador = Personaje(40, 40, SCALA_PERSONAJE)
                         enemigos = inicializar_enemigo(suelo, num_max_enemigos, escala_enemigo, sprite_altura_enemigo)
                         loros = []
                         mover_derecha = False
@@ -513,14 +526,15 @@ async def main():
                         esta_en_suelo = True
                         velocidad_y = 0
                         echando_agua = False
+                        pygame.event.clear()
+                        pygame.time.delay(200)
                         menu = False
                     elif evento.key == pygame.K_2:
-                        await mostrar_instrucciones()
+                        mostrar_instrucciones()
                     elif evento.key == pygame.K_3:
                         pygame.quit()
                         exit()
         else:
-            
             reloj.tick(FPS)
             tiempo_transcurrido += 1 / FPS
             dibujar_fondo(fondo, ventana)
@@ -533,12 +547,16 @@ async def main():
             ventana.blit(texto_tiempo, (ANCHO_VENTANA - 150, 10))
 
             if tiempo_transcurrido >= TIEMPO_TOTAL:
+                sonido_agua.stop()
+                sonido_loro.stop()
+                pygame.mixer.music.stop()
                 ventana.fill((0, 0, 0))
                 mostrar_texto(ventana, "¡Game Over!", 36, 100, 200, (255, 0, 0))
                 mostrar_texto(ventana, "Presiona cualquier tecla para volver al menú.", 20, 100, 250, (255, 255, 255))
                 pygame.display.update()
 
                 esperando = True
+                tiempo_inicio = pygame.time.get_ticks()
                 while esperando:
                     for evento in pygame.event.get():
                         if evento.type == pygame.QUIT:
@@ -546,14 +564,19 @@ async def main():
                             exit()
                         if evento.type == pygame.KEYDOWN:
                             esperando = False
+                    if pygame.time.get_ticks() - tiempo_inicio > 100:
+                        esperando = False
 
                 pygame.event.clear()
-                pygame.time.delay(300)
+                pygame.time.delay(200)
+                menu = True
                 continue
 
             if len(enemigos) == 0 or jugador.forma.top > ALTO_VENTANA:
+                sonido_loro.stop()
+                sonido_agua.stop()
+                pygame.mixer.music.stop()
                 ventana.fill((0, 0, 0))
-
                 jugador_gano = len(enemigos) == 0
                 mensaje = "¡Felicidades! Bosque salvado." if jugador_gano else "¡Game Over!"
                 color = (0, 255, 0) if jugador_gano else (255, 0, 0)
@@ -563,6 +586,7 @@ async def main():
                 pygame.display.update()
 
                 esperando = True
+                tiempo_inicio = pygame.time.get_ticks()
                 while esperando:
                     for evento in pygame.event.get():
                         if evento.type == pygame.QUIT:
@@ -570,9 +594,11 @@ async def main():
                             exit()
                         if evento.type == pygame.KEYDOWN:
                             esperando = False
+                    if pygame.time.get_ticks() - tiempo_inicio > 100:
+                        esperando = False
 
-                pygame.time.delay(200)
                 pygame.event.clear()
+                pygame.time.delay(200)
                 menu = True
                 continue
 
@@ -637,7 +663,6 @@ async def main():
                 else:
                     jugador.cambiar_estado("reposo")
 
-
             for pato in patos:
                 pato.update()
                 pato.dibujar(ventana)
@@ -647,7 +672,7 @@ async def main():
                 enemigo.dibujar(ventana)
 
                 enemigo_rect = pygame.Rect(enemigo.x, enemigo.y, enemigo.animaciones[0].get_width(),
-                                       enemigo.animaciones[0].get_height())
+                                           enemigo.animaciones[0].get_height())
                 if jugador.forma.colliderect(enemigo_rect):
                     if jugador.estado == "agua":
                         enemigos.remove(enemigo)
@@ -704,7 +729,7 @@ async def main():
                         echando_agua = False
 
             pygame.display.update()
-        await asyncio.sleep(0)
+        await asyncio.sleep(0.01)
 
 if __name__ == '__main__':
     asyncio.run(main())
